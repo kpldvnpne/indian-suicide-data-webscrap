@@ -46,8 +46,23 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
 
     return urls_to_return
 
-year_start = 1950
-year_end = 2022
-for year in range(year_start, year_end + 1):
-    print(f'Year: {year}')
-    links = get_urls_of_profession_wise_suicide(year)
+# year_start = 1950
+# year_end = 2022
+# for year in range(year_start, year_end + 1):
+#     print(f'Year: {year}')
+#     links = get_urls_of_profession_wise_suicide(year)
+
+# import tabula
+# links = get_urls_of_profession_wise_suicide(2022)
+# pdf_url = links[0]['url']
+# print(f'URL: {pdf_url}')
+# # table = tabula.read_pdf(pdf_url, pages=1, lattice=True)
+# table = tabula.read_pdf(pdf_url, pages=1, lattice=False)
+# print(table)
+
+import camelot
+links = get_urls_of_profession_wise_suicide(2022)
+pdf_url = links[0]['url']
+print(f'URL: {pdf_url}')
+table = camelot.read_pdf(pdf_url, pages="1", flavor='stream')
+print(table[0].df)
