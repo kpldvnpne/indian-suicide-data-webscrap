@@ -14,9 +14,6 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
 
     # print(response.text)
     soup: BeautifulSoup = parse_html(response.text)
-
-    # table = soup.select_one("h2:-soup-contains('Accidents in India') + table")
-    # table = soup.select_one("body > div > div.c-pagecontent.c-pagecontent-xs > div > div > div > div > div > table")
     table = soup.find('table')
 
     if table == None:
@@ -46,48 +43,45 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
 
     return urls_to_return
 
-# year_start = 1950
-# year_end = 2022
-# for year in range(year_start, year_end + 1):
-#     print(f'Year: {year}')
-#     links = get_urls_of_profession_wise_suicide(year)
-
 import os
 def make_dir(dir_name: str):
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
 
-def convert_using_camelot():
-    make_dir('output/camelot')
-    year = 2022
+def convert_using_camelot(pdf_path: str, year: int, output_suffix: str):
     import camelot
-    links = get_urls_of_profession_wise_suicide(year)
-    for link in links:
-        pdf_name = link['name']
-        pdf_url = link['url']
 
-        name_prefix =  'all-india' if 'All India' in pdf_name else 'state-wise'
-        name = f"output/camelot/{year}-{name_prefix}.csv"
+    folder_path = f'output/camelot/{year}'
+    make_dir(folder_path)
+    tables = camelot.read_pdf(pdf_path, pages="all", flavor='stream')
+    tables.export(f"{folder_path}/{output_suffix}", f='csv')
 
-        tables = camelot.read_pdf(pdf_url, pages="all", flavor='stream')
-        table = tables[0]
-        tables.export(name, f='csv')
-
-def convert_using_tabula():
-    make_dir('output/tabula')
-    year = 2022
+def convert_using_tabula(pdf_path: str, year: int, output_suffix: str):
     import tabula
+
+    folder_path = f'output/tabula/{year}'
+    make_dir(folder_path)
+    tabula.convert_into(pdf_path, f"{folder_path}/{output_suffix}", output_format='csv', pages='all')
+
+import urllib.request
+def download_file(url: str, file_name):
+    urllib.request.urlretrieve(url, file_name)
+
+year_start = 2015
+year_end = 2022
+for year in range(year_start, year_end + 1):
     links = get_urls_of_profession_wise_suicide(year)
 
     for link in links:
         pdf_name = link['name']
         pdf_url = link['url']
 
-        name_prefix =  'all-india' if 'All India' in pdf_name else 'state-wise'
+        name_suffix =  'all-india' if 'All India' in pdf_name else 'state-wise'
+        make_dir(f'tmp/{year}')
+        downloaded_pdf_path = f"tmp/{year}/{name_suffix}.pdf"
+        output_csv_suffix = f"{name_suffix}.csv"
 
-        tabula.convert_into(pdf_url, f"output/tabula/{year}-{name_prefix}.csv", output_format='csv', pages='all')
+        download_file(pdf_url, downloaded_pdf_path)
 
-        # if 'All India' in pdf_name:
-
-convert_using_camelot()
-convert_using_tabula()
+        convert_using_tabula(downloaded_pdf_path, year, output_csv_suffix)
+        convert_using_camelot(downloaded_pdf_path, year, output_csv_suffix)
