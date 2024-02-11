@@ -65,9 +65,9 @@ def convert_using_tabula(pdf_path: str, year: int, output_suffix: str):
 
 import urllib.request
 def download_file(url: str, file_name):
-    urllib.request.urlretrieve(url, file_name)
+    urllib.request.urlretrieve(url.replace(' ', '%20'), file_name)
 
-year_start = 2015
+year_start = 1950
 year_end = 2022
 for year in range(year_start, year_end + 1):
     links = get_urls_of_profession_wise_suicide(year)
