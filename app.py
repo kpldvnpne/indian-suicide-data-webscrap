@@ -52,48 +52,42 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
 #     print(f'Year: {year}')
 #     links = get_urls_of_profession_wise_suicide(year)
 
-# import tabula
-# links = get_urls_of_profession_wise_suicide(2022)
-# pdf_url = links[0]['url']
-# print(f'URL: {pdf_url}')
-# # table = tabula.read_pdf(pdf_url, pages=1, lattice=True)
-# table = tabula.read_pdf(pdf_url, pages=1, lattice=False)
-# print(table)
+import os
+def make_dir(dir_name: str):
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
 
-year = 2022
-import camelot
-links = get_urls_of_profession_wise_suicide(year)
+def convert_using_camelot():
+    make_dir('output/camelot')
+    year = 2022
+    import camelot
+    links = get_urls_of_profession_wise_suicide(year)
+    for link in links:
+        pdf_name = link['name']
+        pdf_url = link['url']
 
-for link in links:
-    pdf_name = link['name']
-    pdf_url = link['url']
+        name_prefix =  'all-india' if 'All India' in pdf_name else 'state-wise'
+        name = f"output/camelot/{year}-{name_prefix}.csv"
 
-    name_prefix =  'all-india' if 'All India' in pdf_name else 'state-wise'
-    name = f"output-{year}-{name_prefix}.csv"
+        tables = camelot.read_pdf(pdf_url, pages="all", flavor='stream')
+        table = tables[0]
+        tables.export(name, f='csv')
 
-    tables = camelot.read_pdf(pdf_url, pages="all", flavor='stream')
-    table = tables[0]
-    tables.export(name, f='csv')
-    # print(tables[0].df)
-    # table[0]
+def convert_using_tabula():
+    make_dir('output/tabula')
+    year = 2022
+    import tabula
+    links = get_urls_of_profession_wise_suicide(year)
 
-    # if 'All India' in pdf_name:
+    for link in links:
+        pdf_name = link['name']
+        pdf_url = link['url']
 
-# year = 2022
-# import tabula
-# links = get_urls_of_profession_wise_suicide(year)
+        name_prefix =  'all-india' if 'All India' in pdf_name else 'state-wise'
 
-# for link in links:
-#     pdf_name = link['name']
-#     pdf_url = link['url']
+        tabula.convert_into(pdf_url, f"output/tabula/{year}-{name_prefix}.csv", output_format='csv', pages='all')
 
-#     name_prefix =  'all-india' if 'All India' in pdf_name else 'state-wise'
+        # if 'All India' in pdf_name:
 
-#     tabula.convert_into(pdf_url, f"output-{year}-{name_prefix}.csv", output_format='csv', pages='1')
-#     # tables = tabula.read_pdf(pdf_url, pages="1")
-#     # table = tables[0]
-#     # tables.export('table.csv', f='csv')
-#     # print(tables[0].df)
-#     # table[0]
-
-#     # if 'All India' in pdf_name:
+convert_using_camelot()
+convert_using_tabula()
