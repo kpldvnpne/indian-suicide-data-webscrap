@@ -18,13 +18,12 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
 
     if table == None:
         print("Table could not be found")
-        return
+        return []
 
     table_rows = table.select('tbody > tr')
 
     if len(table_rows) == 0:
         print('Could not find the table rows')
-        return
 
     urls_to_return: List[Dict[str, str]] = []
 
