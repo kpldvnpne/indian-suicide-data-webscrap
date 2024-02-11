@@ -24,6 +24,7 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
 
     if len(table_rows) == 0:
         print('Could not find the table rows')
+        return []
 
     urls_to_return: List[Dict[str, str]] = []
 
@@ -39,6 +40,9 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
                 'name': pdf_file_name,
                 'url': pdf_file_url
             })
+
+    if len(urls_to_return) == 0:
+        print('Could not find Profession specific data')
 
     return urls_to_return
 
@@ -71,6 +75,9 @@ year_end = 2022
 for year in range(year_start, year_end + 1):
     print(f'Year: {year}')
     links = get_urls_of_profession_wise_suicide(year)
+
+    if len(links) > 2:
+        print(f'Expected at-most 2 pdfs. Found {len(links)}')
 
     for link in links:
         pdf_name = link['name']
