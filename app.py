@@ -69,6 +69,7 @@ def download_file(url: str, file_name):
 year_start = 1950
 year_end = 2022
 for year in range(year_start, year_end + 1):
+    print(f'Year: {year}')
     links = get_urls_of_profession_wise_suicide(year)
 
     for link in links:
