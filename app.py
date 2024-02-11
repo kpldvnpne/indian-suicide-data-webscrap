@@ -40,7 +40,7 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
         if 'Profession' in pdf_file_name:
             print(f'{pdf_file_name}: {pdf_file_url}')
             urls_to_return.append({
-                'file_name': pdf_file_name,
+                'name': pdf_file_name,
                 'url': pdf_file_url
             })
 
@@ -60,9 +60,38 @@ def get_urls_of_profession_wise_suicide(year: int) -> List[str]:
 # table = tabula.read_pdf(pdf_url, pages=1, lattice=False)
 # print(table)
 
-import camelot
-links = get_urls_of_profession_wise_suicide(2022)
-pdf_url = links[0]['url']
-print(f'URL: {pdf_url}')
-table = camelot.read_pdf(pdf_url, pages="1", flavor='stream')
-print(table[0].df)
+# year = 2022
+
+# import camelot
+# links = get_urls_of_profession_wise_suicide(year)
+
+# for link in links:
+#     pdf_name = link['name']
+#     pdf_url = link['url']
+
+#     tables = camelot.read_pdf(pdf_url, pages="1", flavor='stream')
+#     table = tables[0]
+#     tables.export('table.csv', f='csv')
+#     # print(tables[0].df)
+#     # table[0]
+
+#     # if 'All India' in pdf_name:
+
+year = 2022
+import tabula
+links = get_urls_of_profession_wise_suicide(year)
+
+for link in links:
+    pdf_name = link['name']
+    pdf_url = link['url']
+
+    name_prefix =  'all-india' if 'All India' in pdf_name else 'state-wise'
+
+    tabula.convert_into(pdf_url, f"output-{year}-{name_prefix}.csv", output_format='csv', pages='1')
+    # tables = tabula.read_pdf(pdf_url, pages="1")
+    # table = tables[0]
+    # tables.export('table.csv', f='csv')
+    # print(tables[0].df)
+    # table[0]
+
+    # if 'All India' in pdf_name:
